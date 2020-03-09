@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "esnext",
+      "moduleResolution": "node",
+      "module": "commonjs",
+      "lib": ["esnext", "dom"],
+      "allowJs": false,
+      "noEmit": true,
+      "strict": true,
+      "esModuleInterop": false,
+      "allowSyntheticDefaultImports": true,
+      "outDir": "dist",
+    },
+    "include": ["backend", "types.d.ts"],
+  }

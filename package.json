@@ -1,0 +1,8 @@
+{
+  "name": "cross-pwgame",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/xDeaa/-cross-pwgame.git",
+  "author": "Andrea Serrano",
+  "license": "MIT"
+}

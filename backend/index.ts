@@ -1,38 +1,55 @@
 import express from "express";
-import { createServer } from "http";
+import { createServer, Server } from "http";
 import { config } from "dotenv";
 import socketIO from "socket.io";
 
 config();
 
+interface PlayerLogged {
+  name: String,
+  connected: boolean
+}
+
+type PlayersLogList = {[id: string]: PlayerLogged}
+
 const PORT = process.env.PORT;
 
 const app = express();
-const server = createServer(app);
-const io = socketIO(server);
-let players = [];
+const server: Server = createServer(app);
+const io: socketIO.Server = socketIO(server);
+let players: PlayersLogList = {};
+
+
+const createUser = (nickname: string) => {
+  return {name: nickname, connected: true}
+}
 
 app.get("/", (_, res) => {
   res.send("hello fellows");
 });
 
 io.on("connection", socket => {
-  console.log("new connection");
-  socket.emit("event::hello");
-
   socket.on("event::initialize", payload => {
-    if (players.length >= 2) {
-      socket.emit("event::gameFull");
-      return;
+
+    if(payload.nickname !== "") {
+      players[socket.id] = createUser(payload.nickname);
+      console.log(`New player: ${players[socket.id].name}`);
+      
+      return io.emit("event::Login", players[socket.id].name);
     }
 
-    players.push(payload);
-    console.log("new name received: ", payload.nickname);
-
-    if (players.length === 2) {
-      io.emit("event::gameStart");
-    }
+    io.emit("event::enterNickname", 'Please enter a nickname')
+    
+    // if (Object.keys(players).length === 2) {
+    //   io.emit("event::gameStart");
+    // }
   });
+
+  socket.on("event::MagicNumeber:join", payload => {
+    console.log(payload);
+    
+  });
+
 });
 
 server.listen(PORT, () => {

@@ -1,16 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
+import React from "react";
+import AskNickname from "./AskNickname"
 
-import {Home, AskNickname, MagicNumber, ChooseGames} from "./components";
-import { SocketProvider } from "./contexts/SocketProvider";
-
-const App = () => {
-  return (
-    <section className="hero is-fullheight is-light">
+const Home = () => {
+    return (
+        <section className="hero is-fullheight is-light">
         <div className="hero-head">
             <div className="container">
             <div className="tabs is-centered">
@@ -26,15 +19,7 @@ const App = () => {
         <div className="hero-body">
             <div className="container">
             <header className="bd-index-header">
-            <SocketProvider>
-              <Router>
-                  <Switch>
-                    <Route path="/" exact component={AskNickname}/>
-                    <Route path="/games" exact component={ChooseGames}/>
-                    <Route path="/games/MagicNumber" exact component={MagicNumber}/>
-                  </Switch>
-              </Router>
-            </SocketProvider>
+                <AskNickname/>
             </header>
             </div>
         </div>
@@ -50,7 +35,7 @@ const App = () => {
             </div>
         </div>
     </section>
-  );
-};
+    )
+}
 
-export default App;
+export default Home

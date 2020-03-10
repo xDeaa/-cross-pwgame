@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { Redirect } from 'react-router-dom'
+import { context } from "../contexts/SocketProvider";
 
-const AskNickname = ({ io }) => {
+const AskNickname = () => {
+  const io = useContext(context);
   const [nickname, setNickname] = useState("");
+  const [isLogged, setIsLogged] = useState(false);
 
   const handleNickname = event => {
     setNickname(event.target.value);
@@ -9,7 +13,12 @@ const AskNickname = ({ io }) => {
 
   const sendNickname = () => {
     io.emit("event::initialize", { nickname });
+    setIsLogged(true)
   };
+
+  if (isLogged) {
+    return <Redirect to="/games"/> 
+  }
 
   return (
     <div className="field">

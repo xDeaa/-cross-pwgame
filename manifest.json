@@ -1,0 +1,10 @@
+{
+    "name": "Pwa Games",
+    "short_name": "pwa_games",
+    "theme_color": "#2196f3",
+    "background_color": "#2196f3",
+    "display": "fullscreen",
+    "orientation": "portrait",
+    "scope": "/",
+    "start_url": "/"
+  }

@@ -1,14 +1,16 @@
 import socketIO from "socket.io";
 import Player from './interface/Player'
 
-export default class Game {
-    players : Array<Player>
+type PlayersList = {[id: string]: Player}
+
+export default  abstract class Game {
+    players : PlayersList
 
     constructor() {
-        this.players = []
+        this.players = {}
     }
 
     public addPlayer(player : Player) {
-        this.players.push(player)
+        this.players[player.socket.id] = player
     }
 }

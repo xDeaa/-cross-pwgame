@@ -2,6 +2,7 @@ import express from "express";
 import { createServer, Server } from "http";
 import { config } from "dotenv";
 import socketIO from "socket.io";
+import GameFactory from "./GameFactory"
 
 config();
 
@@ -45,9 +46,20 @@ io.on("connection", socket => {
     // }
   });
 
-  socket.on("event::MagicNumeber:join", payload => {
-    console.log(payload);
+  socket.on("event::Game::join", payload => {
+    const {gameName} = payload
     
+    const player = {
+      name : players[socket.id].name, 
+      socket,
+      points: 0
+    }
+
+    const game = new GameFactory()
+    const gameCreated = game.createGame(gameName);
+
+    gameCreated?.addPlayer(player)
+    gameCreated?.initGame();
   });
 
 });

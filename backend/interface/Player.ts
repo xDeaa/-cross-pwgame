@@ -1,4 +1,7 @@
+import socketIO, { Socket } from "socket.io";
+
 export default interface Player {
-    name: string,
-    state: boolean
+    name: String,
+    socket: socketIO.Socket,
+    points: number
 }

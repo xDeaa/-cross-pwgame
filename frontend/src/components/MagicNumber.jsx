@@ -1,26 +1,37 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+
 import { contextSocket } from "../contexts/SocketProvider";
+import WaitGame from "./WaitGame"
 
 const MagicNumber = () => {
-  const [gameStarted, setGameStarter] = useState(false);
-  const [disabled, setdisabled] = useState(true);
-
-
   const io = useContext(contextSocket)
+  const [gameStarted, setGameStarter] = useState(false);
   const [number, setNumber] = useState("");
-  const initGame = () => {
-    io.emit("event::MagicNumber::init")
-  }
-  //io.emit("event::MagicNumber::init", )
-  initGame()
+ 
+  useEffect(() => {
+    io.on("event::MagicNumber::Start", () => {
+      setGameStarter(true)
+    })
+
+   io.on("event::MagicNumber::result", message => {
+     alert(message)
+   })
+   
+  }, [])
+
   const handleNumber = event => {
     setNumber(event.target.value);
   };
 
+  
+
   const sendNumber = () => {
-    io.emit("event::MagicNumber::sendNumber", { number });
+    io.emit("event::MagicNumber::send", { number });
   };
 
+  if(!gameStarted) {
+    return <WaitGame />
+  }
   return (
     <section className="hero is-fullheight is-light">
       <div className="hero-head">

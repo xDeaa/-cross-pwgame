@@ -3,8 +3,6 @@ import { contextSocket } from "../contexts/SocketProvider";
 import { useHistory } from 'react-router-dom'
 
 const ChooseGames = () => {
-  const [player, setPlayer] = useState("");
-
   const io = useContext(contextSocket);
   const history = useHistory();
 
@@ -13,7 +11,7 @@ const ChooseGames = () => {
   })
 
   const joinGame = (game) => {
-    io.emit("event::Game::join", { gameName: game, player: player })
+    io.emit("event::Game::join", { gameName: game})
     history.push(`/games/${game}`)
   }
 

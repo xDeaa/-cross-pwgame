@@ -12,7 +12,7 @@ const AskNickname = () => {
   };
 
   const sendNickname = () => {
-    io.emit("event::initialize", { nickname });
+    io.emit("event::setNickname", { nickname });
     setIsLogged(true)
   };
 

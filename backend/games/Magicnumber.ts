@@ -1,4 +1,5 @@
 import chalk from "chalk"
+import { Socket } from "socket.io"
 
 export default class MagicNumber {
     private magicNumber: number
@@ -18,19 +19,13 @@ export default class MagicNumber {
         for (const [key, player] of this.players) {
             player.socket.emit("event::MagicNumber::Start", "Game Started ! 🏁")
             this.listen(player)
-            console.log(player.points);
-
-            if (player.points === 3) {
-                player.socket.emit("event::MagicNumber:Win", `🎊The player ${player.nickname} win 🎊`)
-                this.end()
-            }
         }
     }
 
 
-    end() {
-        console.log(chalk.greenBright("The Game is finish 👏"));
-        return false
+    end(socket: Socket, message: string) {
+        console.log(chalk.greenBright(message));
+        socket.emit("event::MagicNumber::End", message)
     }
 
     private generateRandomNumber() {
@@ -48,24 +43,49 @@ export default class MagicNumber {
         if (this.minMagicNumber > 0 && number > this.maxMagicNumber) {
             return `The number is between ${this.minMagicNumber} and ${this.maxMagicNumber}`
         }
+      
+        if(number == this.magicNumber) {
+            return "You win 1 point 🎈"
+        }
 
-        return "You win 1 point 🎈"
+        return "Something went wrong"
     }
 
     private listen(player: Player) {
         const { socket } = player
+        
         socket.on("event::MagicNumber::send", ({ number }) => {
-            //console.log(player);
-
-            const numberFind = this.checkNumber(number)
+            const numberFind: string = this.checkNumber(number)
             console.log(chalk.gray(numberFind));
             socket.emit("event::MagicNumber::result", numberFind)
 
             if (numberFind == "You win 1 point 🎈") {
-                //this.players.set(player.socket.id, {...player, points})
+                player.points += 1;
                 this.magicNumber = this.generateRandomNumber()
                 console.log(chalk.greenBright(`New number to find: ${this.magicNumber} 🎲`));
             }
+
+            if (player.points === 3) {                
+                this.magicNumber = 0
+                socket.emit("event::MagicNumber::Win", `🎊The player ${player.nickname} win 🎊`)
+                console.log(chalk.greenBright(`🎊The player ${player.nickname} win 🎊`));
+                this.end(socket, `The Game is finish 👏`)
+            }
         })
+        
+        socket.on("event::MagicNumber::Quit", () => {
+            const player = this.players.get(socket.id)
+            console.log(player);
+        })
+
+        socket.on("disconnect", () => {
+            this.players.forEach(player => {                
+                if(player.socket.id !== socket.id) {
+                    this.end(player.socket, "Your challenger quit the room")
+                } else {
+                    return this.players.delete(socket.id)
+                }
+            })        
+        })  
     }
 }

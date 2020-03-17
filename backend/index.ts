@@ -1,8 +1,9 @@
-import postlude from "./postlude"
+import checkEnv from './sys/prelude';
+import postlude from "./sys/postlude"
+
 import GameHandler from "./GameHandler";
 
-
-postlude
+checkEnv()
+postlude()
 const game = GameHandler.getInstance()
 game.run()
-

@@ -1,4 +1,4 @@
-import MagicNumber from "./Magicnumber";
+import MagicNumber from "./games/Magicnumber";
 import Game from "./Game";
 
 export default class GameFactory {

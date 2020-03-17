@@ -3,6 +3,7 @@ import { createServer } from "http";
 import socketIO from "socket.io"
 import chalk from "chalk"
 import GameFactory from "./GameFactory";
+import { isArray } from "util";
 
 export default class GameHandler {
     public static instance: GameHandler | null = null
@@ -48,23 +49,28 @@ export default class GameHandler {
 
     private listener(socketClient) {
         socketClient.on("event::Game::join", ({gameName}) => {
-            let player = this.listPlayers.get(socketClient.id)
+            const player = this.listPlayers.get(socketClient.id)            
             player.selectedGame = gameName;
 
-            let challenger = this.findChallenger(player.socket.id, gameName);
+            const challenger = this.findChallenger(player.socket.id, gameName);
 
             if(challenger) {
                 console.log(chalk.green(`👊 New Challenger: ${challenger.nickname} 👊`));
                 const game = new GameFactory()
-                
-                const players = this.addPlayersInGame([player, challenger])
-                console.log(players);
-                
-                
+                const players = this.handlePlayersInGame([player, challenger], true) 
                 const choosedGame = game.createGame(gameName, players)
                 choosedGame.start()
             }
-        })
+        })  
+
+        socketClient.on(`event::Game::End`, () => {             
+            this.listPlayers.forEach(player => {
+                if(player.socket.id === socketClient.id) {
+                    this.handlePlayersInGame(player, false)
+                    this.removeSelectedGame(player)
+                }
+            })
+        }) 
     }
 
     private findChallenger(playerId: string, title: string) {
@@ -76,11 +82,20 @@ export default class GameHandler {
          return null
     }
 
-    private addPlayersInGame(players: Player[]) {
-        for(const player of players) {
-            this.listPlayers.set(player.socket.id, {...player, onGame: true, points: 0})
+    private handlePlayersInGame(players: Player[] | Player, inGame: boolean) {
+        if(isArray(players)) {
+            for(const player of players) {
+                this.listPlayers.set(player.socket.id, {...player, onGame: inGame, points: 0})
+            }
+        } else {
+            this.listPlayers.set(players.socket.id, {...players, onGame: inGame, points: 0})
         }
 
         return this.listPlayers
+    }
+
+
+    private removeSelectedGame(players: Player[] | Player) {
+        return this.listPlayers.set(players.socket.id, {...players, selectedGame: '', points: 0})
     }
 }

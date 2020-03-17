@@ -1,35 +1,47 @@
 import React, { useState, useContext, useEffect } from "react";
+import { useHistory } from 'react-router-dom'
 
 import { contextSocket } from "../contexts/SocketProvider";
 import WaitGame from "./WaitGame"
 
 const MagicNumber = () => {
   const io = useContext(contextSocket)
+  const history = useHistory();
   const [gameStarted, setGameStarter] = useState(false);
   const [number, setNumber] = useState("");
- 
+
   useEffect(() => {
     io.on("event::MagicNumber::Start", () => {
       setGameStarter(true)
     })
 
-   io.on("event::MagicNumber::result", message => {
-     alert(message)
-   })
-   
+    io.on("event::MagicNumber::result", message => {
+      alert(message)
+    })
+
+    io.on("event::MagicNumber::Win", message => {
+      alert(message)
+    })
+
+    io.on("event::MagicNumber::End", message => {
+      alert(message)
+      io.emit("event::Game::End")
+      history.push('/games')
+    })
+
   }, [])
 
   const handleNumber = event => {
     setNumber(event.target.value);
   };
 
-  
+
 
   const sendNumber = () => {
     io.emit("event::MagicNumber::send", { number });
   };
 
-  if(!gameStarted) {
+  if (!gameStarted) {
     return <WaitGame />
   }
   return (
